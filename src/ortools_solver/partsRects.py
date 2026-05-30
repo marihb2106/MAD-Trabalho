@@ -1,14 +1,15 @@
 from ortools.linear_solver import pywraplp
 
 def solve_partRects():
-    solver = pywraplp.Solver.CreateSolver('SCIP')  # MIP solver
+    # Cria o solver MIP
+    solver = pywraplp.Solver.CreateSolver('SCIP')
 
-    # Decision variables
+    # Variáveis de decisão
     x = {}
     for i in range(1,9):
         x[i] = solver.IntVar(0, 1, f'x_{i}')
     
-    # Constraints
+    # Restrições
     solver.Add(x[8] >= 1)
     solver.Add(x[8]+x[7] >= 1)
     solver.Add(x[7]+x[6]+x[4]+x[5] >= 1)
@@ -20,21 +21,21 @@ def solve_partRects():
     solver.Add(x[1]+x[3]+x[2] >= 1)
     solver.Add(x[1] >= 1)
     
-    # Objective: minimize cost
+    # Objetivo: minimizar o custo
     objective = solver.Objective()
     for i in range(1,9):
         objective.SetCoefficient(x[i],1)
     objective.SetMinimization()
 
-    # Solve
+    # Resolver
     status = solver.Solve()
 
     if status == pywraplp.Solver.OPTIMAL:
-        print("Optimal cost:", objective.Value())
+        print("Custo ótimo:", objective.Value())
         for i in range(1,9):
             if x[i].solution_value() > 0.5:
-                print(f'Guard at node {i}')
+                print(f'Guarda no nó {i}')
     else:
-        print("No optimal solution found.")
+        print("Nenhuma solução ótima encontrada.")
 
 solve_partRects()
