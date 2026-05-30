@@ -1,68 +1,70 @@
-======================================================================
-PROJETO DE VIGILÂNCIA DE PARTIÇÕES RETANGULARES
-======================================================================
+====================================================================
+Projeto de Vigilância de Partições Retangulares
+====================================================================
 
 GRUPO
------
-* Beatriz Castro
-* Joana Ferreira
-* Mariana Bissacot
+--------------------------------------------------------------------
+* Beatriz Castro (up202306399)
+* Joana Ferreira (up202305202)
+* Mariana Bissacot (up202306832)
 
+DESCRIÇÃO DO PROJETO
+--------------------------------------------------------------------
+Este projeto tem como objetivo otimizar os recursos necessários para 
+a vigilância completa de uma área dividida geometricamente em 
+retângulos. O foco principal é determinar o número mínimo de guardas 
+que devem ser posicionados (exclusivamente nos vértices) para garantir 
+que cada retângulo da partição seja vigiado por pelo menos um guarda.
 
-DESCRIÇÃO DO PROBLEMA
----------------------
-O problema consiste em determinar o número mínimo de guardas necessários,
-posicionados exclusivamente nos vértices únicos da partição, de forma a que
-cada retângulo seja vigiado por pelo menos um guarda. 
+Matematicamente, o problema foi modelado como uma instância do 
+problema de Cobertura de Conjuntos (Set Cover), adaptada à estrutura 
+geométrica proposta. A função objetivo visa minimizar o custo total 
+(número de guardas): Minimizar Z = Sum(Xi).
 
-Este desafio foi modelado matematicamente como uma instância específica do
-problema de Cobertura de Conjuntos (Set Cover), adaptada para uma estrutura
-geométrica de retângulos e vértices: 
-* Variáveis de Decisão: x_i em {0,1} (1 se um guarda for colocado no vértice único v_i, 0 caso contrário).
-* Função Objetivo: Minimizar Z = somatório(x_i) para i=1 até n.
-* Restrições: somatório(x_i) >= 1 para cada retângulo r_j, onde i pertence a Adj(r_j).
+ABORDAGENS IMPLEMENTADAS
+--------------------------------------------------------------------
+Para resolver o problema e comparar resultados, foram desenvolvidas 
+quatro abordagens distintas:
 
+1. Solver Manual (Python)
+   - Focado em algoritmos de satisfação de restrições (CSP).
+   - Utiliza o algoritmo Generalized Arc Consistency (GAC), uma 
+     generalização do AC-3, para lidar com restrições n-árias.
+   - Implementa a heurística de Maior Grau para acelerar a 
+     convergência.
 
-ALGORITMOS IMPLEMENTADOS
-------------------------
-O projeto explora o problema através de três lentes algorítmicas distintas:
+2. Heurísticas Gananciosas (Greedy)
+   - Por Inserção (Maior Cobertura): Começa sem guardas e seleciona 
+     iterativamente o vértice que vigia o maior número de retângulos 
+     ainda descobertos.
+   - Por Remoção (Reverse Greedy): Começa com guardas em todos os 
+     vértices e remove iterativamente os guardas mais redundantes.
 
-1. Satisfação de Restrições (CSP Imperativo) — solver_mac.py
-Desenvolvido em Python, este solver foca-se em algoritmos de satisfação de restrições (CSP):
-* Generalized Arc Consistency (GAC): Algoritmo de propagação de restrições n-árias usado para deduzir valores obrigatórios e podar a árvore antes de novas ramificações.
-* Degree Heuristic (Maior Grau): Heurística de ordenação baseada na incidência dos vértices para acelerar a convergência.
+3. Programação Dinâmica
+   - Modelação através de Bitmasking e da Equação de Bellman.
+   - Exata e rápida para subproblemas pequenos, mas computacionalmente 
+     inviável para partições completas devido à explosão combinatória.
 
-2. Abordagens Heurísticas (Greedy) e Programação Dinâmica
-Procuram o compromisso entre tempo de computação e otimalidade:
-* Greedy por Inserção (Maior Cobertura): Abordagem progressiva que escolhe o vértice que vigia o maior número de retângulos ainda sem cobertura.
-* Greedy por Remoção (Reverse Greedy): Abordagem inversa que inicia com guardas em todos os vértices e remove sequencialmente os redundantes.
-* Programação Dinâmica (Bitmasking): Resolução exata baseada na Equação de Bellman para subproblemas de tamanho reduzido.
+4. Programação em Lógica (Prolog)
+   - Abordagem declarativa utilizando 'clpfd' para modelar a restrição 
+     de soma.
+   - Usada estritamente para validação matemática do modelo em 
+     instâncias miniatura e para o desenvolvimento de extensões.
 
-3. Programação em Lógica (Prolog)
-Modelação declarativa focada na definição de relações lógicas e restrições de soma:
-* Extensão 4a (Restrições de Cores): Garante que os guardas no mesmo retângulo possuam cores distintas usando a restrição all_distinct.
-* Extensão 4b (Alcance de Distância D): Pré-calcula a adjacência de vértices para transformar o problema numa estrutura de grafo de dominância.
+EXTENSÕES E VARIANTES
+--------------------------------------------------------------------
+* Cobertura Parcial: As restrições aplicam-se apenas a um subconjunto 
+  de retângulos. A redução de guardas não é linear face à fração de 
+  retângulos obrigatórios.
+* Guardas com Cores: Guardas no mesmo retângulo devem ter cores 
+  distintas. O número de cores depende da geometria da solução.
+* Guardas com Maior Alcance (D=1): Um guarda num vértice cobre também 
+  os retângulos a uma distância 1. Reduz o número de guardas em 50% 
+  a 75%.
 
-
-RESULTADOS EXPERIMENTAIS
-------------------------
-Os resultados demonstram o impacto da explosão combinatória e o compromisso entre eficiência e otimalidade face ao solver comercial Google OR-Tools (SCIP):
-
-+-----------+----------------+------------------+---------------------+-------------------+--------------+-----------------+
-| Instância | Vértices Únicos| Ótimo (OR-Tools) | Melhor Manual (MAC) | Greedy (Inserção) | Tempo Greedy | Nós (Greedy/PD) |
-+-----------+----------------+------------------+---------------------+-------------------+--------------+-----------------+
-| parts40   | 82             | 14               | 15                  | 17                | 0.00032s     | 0 (Sem Nó)      |
-| step50    | 102            | 17               | 18                  | 22                | 0.00049s     | 0 (Sem Nó)      |
-+-----------+----------------+------------------+---------------------+-------------------+--------------+-----------------+
-
-
-COMO EXECUTAR
--------------
-
-Pré-requisitos:
-* Python 3.x 
-* Interpretador SWI-Prolog (para os ficheiros declarativos) 
-* Google OR-Tools (opcional, para validação da baseline) 
-
-Executar o Solver Manual (CSP/GAC):
-$ python solver_mac.py
+FICHEIROS E INSTÂNCIAS DE REFERÊNCIA
+--------------------------------------------------------------------
+* solver_mac.py: Implementação do solver manual em Python.
+* mini_A, mini_B, mini_C: Instâncias de validação.
+* parts40: 100 instâncias aleatórias (40 retângulos e 82 vértices).
+* step50: Instância complexa (50 retângulos e 102 vértices).
