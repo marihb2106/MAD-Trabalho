@@ -10,10 +10,6 @@ GRUPO:
 --------------------------------------------------------------------------------
 1. ESTRUTURA DO DIRETÓRIO
 --------------------------------------------------------------------------------
-O arquivo submetido está organizado de forma modular. A raiz do projeto contém 
-o relatório e este guia, enquanto o código-fonte e os dados estão divididos 
-nas seguintes diretorias:
-
 .
 |-- README.txt                 (Este ficheiro com instruções de execução)
 |-- relatorio.pdf              (Relatório final do projeto)
@@ -37,9 +33,6 @@ PRÉ-REQUISITOS:
 - Python 3.x
 - Interpretador SWI-Prolog
 - Biblioteca OR-Tools (para executar a baseline): pip install ortools
-
-NOTA IMPORTANTE: Todos os comandos de terminal abaixo assumem que a linha 
-de comandos está aberta na pasta RAIZ do projeto.
 
 A. EXECUTAR O SOLVER MANUAL (MAC / GAC - Generalização AC-3)
 Para correr o motor de restrições desenvolvido manualmente:
