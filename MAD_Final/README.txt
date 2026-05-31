@@ -1,88 +1,82 @@
-====================================================================
-Projeto de Vigilância de Partições Retangulares
-====================================================================
+================================================================================
+PROJETO DE VIGILÂNCIA DE PARTIÇÕES RETANGULARES - MAD 2025/2026
+================================================================================
 
-GRUPO
---------------------------------------------------------------------
-* Beatriz Castro (up202306399)
-* Joana Ferreira (up202305202)
-* Mariana Bissacot (up202306832)
+GRUPO: 
+- Beatriz Castro (up202306399)
+- Joana Ferreira (up202305202)
+- Mariana Bissacot (up202306832)
 
-ESTRUTURA DO DIRETÓRIO
---------------------------------------------------------------------
-/ (Raiz)
-|-- README.txt                 (Instruções de execução)
-|-- relatorio.pdf   (Relatório final do projeto) -> NOTA: INSERIR AQUI
+--------------------------------------------------------------------------------
+1. ESTRUTURA DO DIRETÓRIO
+--------------------------------------------------------------------------------
+O arquivo submetido está organizado de forma modular. A raiz do projeto contém 
+o relatório e este guia, enquanto o código-fonte e os dados estão divididos 
+nas seguintes diretorias:
+
+.
+|-- README.txt                 (Este ficheiro com instruções de execução)
+|-- relatorio.pdf              (Relatório final do projeto)
 |
 |-- data/
-|   |-- examples/              (Instâncias de teste para os algoritmos)
+|   |-- examples/              (Instâncias de teste)
 |       |-- parts40
 |       |-- step50
 |
 |-- src/
-|-- generator/             (Código em C para geração de instâncias)
-|-- greedy_solver/         (Heurísticas Greedy e Programação Dinâmica)
-|-- manual_solver/         (Solver CSP imperativo com MAC/GAC)
-|-- ortools_solver/        (Baseline ótimo utilizando Google OR-Tools)
-|-- prolog_solver/         (Modelação declarativa pura e gerador de factos)
+    |-- generator/             (Código em C para geração de instâncias)
+    |-- greedy_solver/         (Heurísticas Greedy e Programação Dinâmica)
+    |-- manual_solver/         (Solver CSP imperativo com MAC/GAC)
+    |-- ortools_solver/        (Baseline ótimo utilizando Google OR-Tools)
+    |-- prolog_solver/         (Modelação declarativa pura e extensões)
 
-DESCRIÇÃO DO PROJETO
---------------------------------------------------------------------
-Este projeto tem como objetivo otimizar os recursos necessários para 
-a vigilância completa de uma área dividida geometricamente em 
-retângulos. O foco principal é determinar o número mínimo de guardas 
-que devem ser posicionados (exclusivamente nos vértices) para garantir 
-que cada retângulo da partição seja vigiado por pelo menos um guarda.
+--------------------------------------------------------------------------------
+2. INSTRUÇÕES DE EXECUÇÃO DOS PROGRAMAS
+--------------------------------------------------------------------------------
+PRÉ-REQUISITOS:
+- Python 3.x
+- Interpretador SWI-Prolog
+- Biblioteca OR-Tools (para executar a baseline): pip install ortools
 
-Matematicamente, o problema foi modelado como uma instância do 
-problema de Cobertura de Conjuntos (Set Cover), adaptada à estrutura 
-geométrica proposta. A função objetivo visa minimizar o custo total 
-(número de guardas): Minimizar Z = Sum(Xi).
+NOTA IMPORTANTE: Todos os comandos de terminal abaixo assumem que a linha 
+de comandos está aberta na pasta RAIZ do projeto.
 
-ABORDAGENS IMPLEMENTADAS
---------------------------------------------------------------------
-Para resolver o problema e comparar resultados, foram desenvolvidas 
-quatro abordagens distintas:
+A. EXECUTAR O SOLVER MANUAL (MAC / GAC - Generalização AC-3)
+Para correr o motor de restrições desenvolvido manualmente:
+> python src/manual_solver/solver_mac.py --instance data/examples/step50
 
-1. Solver Manual (Python)
-   - Focado em algoritmos de satisfação de restrições (CSP).
-   - Utiliza o algoritmo Generalized Arc Consistency (GAC), uma 
-     generalização do AC-3, para lidar com restrições n-árias.
-   - Implementa a heurística de Maior Grau para acelerar a 
-     convergência.
+B. EXECUTAR OS ALGORITMOS GANANCIOSOS (Greedy / DP)
+Para correr a abordagem heurística rápida ou a Programação Dinâmica:
+> python src/greedy_solver/solver_greedy.py --instance data/examples/step50
 
-2. Heurísticas Gananciosas (Greedy)
-   - Por Inserção (Maior Cobertura): Começa sem guardas e seleciona 
-     iterativamente o vértice que vigia o maior número de retângulos 
-     ainda descobertos.
-   - Por Remoção (Reverse Greedy): Começa com guardas em todos os 
-     vértices e remove iterativamente os guardas mais redundantes.
+C. EXECUTAR A BASELINE (Google OR-Tools - Cobertura Total e Parcial)
+Para verificar o resultado ótimo utilizando a ferramenta comercial:
+> python src/ortools_solver/solver_ortools.py --instance data/examples/step50
 
-3. Programação Dinâmica
-   - Modelação através de Bitmasking e da Equação de Bellman.
-   - Exata e rápida para subproblemas pequenos, mas computacionalmente 
-     inviável para partições completas devido à explosão combinatória.
+D. EXECUTAR A MODELAÇÃO DECLARATIVA E EXTENSÕES (Prolog)
+Navegue para a pasta do Prolog e abra o interpretador:
+> cd src/prolog_solver
+> swipl
 
-4. Programação em Lógica (Prolog)
-   - Abordagem declarativa utilizando 'clpfd' para modelar a restrição 
-     de soma.
-   - Usada estritamente para validação matemática do modelo em 
-     instâncias miniatura e para o desenvolvimento de extensões.
+Dentro do interpretador, carregue o solver base e os dados (ex. parts40):
+?- [solver_clpfd].
+?- [dados_parts40].
+?- resolver_instancia(Solucao).
 
-EXTENSÕES E VARIANTES
---------------------------------------------------------------------
-* Cobertura Parcial: As restrições aplicam-se apenas a um subconjunto 
-  de retângulos. A redução de guardas não é linear face à fração de 
-  retângulos obrigatórios.
-* Guardas com Cores: Guardas no mesmo retângulo devem ter cores 
-  distintas. O número de cores depende da geometria da solução.
-* Guardas com Maior Alcance (D=1): Um guarda num vértice cobre também 
-  os retângulos a uma distância 1. Reduz o número de guardas em 50% 
-  a 75%.
+Para testar as Extensões 4a (Cores) e 4b (Alcance D=1):
+Carregue os respetivos ficheiros e execute os predicados de teste:
+?- [extensao_cores].
+?- [extensao_alcance].
+?- [test_alcance].
 
-FICHEIROS E INSTÂNCIAS DE REFERÊNCIA
---------------------------------------------------------------------
-* solver_mac.py: Implementação do solver manual em Python.
-* mini_A, mini_B, mini_C: Instâncias de validação.
-* parts40: 100 instâncias aleatórias (40 retângulos e 82 vértices).
-* step50: Instância complexa (50 retângulos e 102 vértices).
+--------------------------------------------------------------------------------
+3. DESTAQUES DO MODELO
+--------------------------------------------------------------------------------
+Conforme detalhado no relatorio.pdf, este projeto implementa:
+- Variante de Cobertura Parcial: Onde as restrições se aplicam apenas a um 
+  subconjunto de retângulos (25%, 50%, 75%).
+- GAC (Generalized Arc Consistency): Sendo o problema de Cobertura de Conjuntos
+  baseado em restrições n-árias, o algoritmo AC-3 clássico foi generalizado.
+- Extensões Lógicas: Otimização simultânea de guardas e cores, e expansão de
+  vizinhança para alcance D=1.
+================================================================================
