@@ -8,6 +8,24 @@ GRUPO
 * Joana Ferreira (up202305202)
 * Mariana Bissacot (up202306832)
 
+ESTRUTURA DO DIRETÓRIO
+--------------------------------------------------------------------
+/ (Raiz)
+|-- README.txt                 (Instruções de execução)
+|-- relatorio.pdf   (Relatório final do projeto) -> NOTA: INSERIR AQUI
+|
+|-- data/
+|   |-- examples/              (Instâncias de teste para os algoritmos)
+|       |-- parts40
+|       |-- step50
+|
+|-- src/
+|-- generator/             (Código em C para geração de instâncias)
+|-- greedy_solver/         (Heurísticas Greedy e Programação Dinâmica)
+|-- manual_solver/         (Solver CSP imperativo com MAC/GAC)
+|-- ortools_solver/        (Baseline ótimo utilizando Google OR-Tools)
+|-- prolog_solver/         (Modelação declarativa pura e gerador de factos)
+
 DESCRIÇÃO DO PROJETO
 --------------------------------------------------------------------
 Este projeto tem como objetivo otimizar os recursos necessários para 
